@@ -12,13 +12,13 @@ MosaitImg::MosaitImg() : filename()
 
 MosaitImg::MosaitImg(string & file) : filename(file)
 {
-	fipImage::fipImage image;
+	fipImage image;
 	if (!image.load(file.c_str()))
 		throw string("Error while loading image");
 	init(image);
 }
 
-MosaitImg::MosaitImg(fipImage::fipImage & image) : filename()
+MosaitImg::MosaitImg(fipImage & image) : filename()
 {
 	init(image);
 }
@@ -37,9 +37,9 @@ MosaitImg::MosaitImg(int size_x, int size_y) :filename("randomized")
 	}	
 }
 
-void MosaitImg::init(fipImage::fipImage & image)
+void MosaitImg::init(fipImage & image)
 {
-	fipImage::fipImage small = image;
+	fipImage small = image;
 	small.rescale(DEF_IMG_X, DEF_IMG_Y, FILTER_BICUBIC);
 	small.convertToRGBF();
         FIRGBF *px = (FIRGBF*) small.accessPixels();

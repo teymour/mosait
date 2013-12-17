@@ -32,7 +32,7 @@ class DLLEXPORT MosaitImg
 {
 	public:
 		MosaitImg(string & file);
-		MosaitImg(fipImage::fipImage & image) ;
+		MosaitImg(fipImage & image) ;
 //		MosaitImg(fipImage::fipImage image) ;
 		MosaitImg(int size_x, int size_y);
 		MosaitImg();
@@ -63,7 +63,7 @@ class DLLEXPORT MosaitImg
 		string filename;
 		vector<MosaitPixel> pixels;
 		float distance;
-		void init(fipImage::fipImage & image) ;
+		void init(fipImage & image) ;
 };
 
 

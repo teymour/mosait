@@ -13,6 +13,8 @@
 #include <time.h>
 #include "MosaitCentroid.h"
 #include <sys/stat.h>
+#include <getopt.h>
+#include <unistd.h>
 
 using namespace std;
 
@@ -127,14 +129,14 @@ bool compareByDistance(const pair<int, MosaitImg> & ir1, const pair<int, MosaitI
 	return MosaitImg::compareByDistance(ir1.second, ir2.second);
 }
 
-void mosait(fipImage::fipImage & image, MosaitCentroid & centroid, vector<MosaitImg> & images_dest, bool uniq = true)
+void mosait(fipImage & image, MosaitCentroid & centroid, vector<MosaitImg> & images_dest, bool uniq = true)
 {
 	cerr << "Crop images..." << endl;
 	vector<pair<int, MosaitImg> > images_src;
 	int i = 0;
 	for(int y = 0 ; y < image.getHeight()/DEF_IMG_Y -1; y++) {
 		for (int x = 0 ; x < image.getWidth()/DEF_IMG_X -1; x++) {
-			fipImage::fipImage small;
+			fipImage small;
 			image.copySubImage(small, x*DEF_IMG_X, y*DEF_IMG_Y, x*DEF_IMG_X+DEF_IMG_X, y*DEF_IMG_Y+DEF_IMG_Y);
 			images_src.push_back(pair<int, MosaitImg> (i, small));
 //			cerr << images_src.back().second << endl;
@@ -182,7 +184,7 @@ void mosait(fipImage::fipImage & image, MosaitCentroid & centroid, vector<Mosait
 	cout << sum/nb << endl;
 }
 
-void print_images(vector<MosaitImg> & images_dest, fipImage::fipImage & image_orig, ostream & screen) 
+void print_images(vector<MosaitImg> & images_dest, fipImage & image_orig, ostream & screen) 
 {
 	int x = 0;
 	screen << endl;
@@ -197,17 +199,17 @@ void print_images(vector<MosaitImg> & images_dest, fipImage::fipImage & image_or
 	}
 }
 
-void save_final_image(vector<MosaitImg> & images_dest, fipImage::fipImage & image_orig, string final_name, int max_final_size = 0) 
+void save_final_image(vector<MosaitImg> & images_dest, fipImage & image_orig, string final_name, int max_final_size = 0) 
 {
 	cerr << "Create final image..." << endl;
 	WORD left = 0;
 	WORD top  = 0;
-	fipImage::fipImage img;
+	fipImage img;
         if (!img.load(images_dest[0].getFileName().c_str()))
 		cerr << "cannot load " << images_dest[0].getFileName() << endl;
 	WORD max_left = img.getWidth() *(image_orig.getWidth()/DEF_IMG_X -1);
 	WORD max_top =  img.getHeight()*(image_orig.getHeight()/DEF_IMG_Y -1);
-	fipImage::fipImage finalImage;
+	fipImage finalImage;
 	finalImage.setSize (FIT_BITMAP, max_left, max_top, 24);
 	cerr << "final image: "<< max_left << "x" << max_top << endl;
 	for (vector<MosaitImg>::iterator iDest = images_dest.begin() ; iDest < images_dest.end() ; iDest++)
@@ -310,7 +312,7 @@ void mosait_do(char* & db, char* & in_img, char* & out_img, bool uniq, int size,
         MosaitCentroid centroid;
 	string sdb(db);
 	load_centroid_from_file(sdb, centroid);
-	fipImage::fipImage image_orig;
+	fipImage image_orig;
         image_orig.load(in_img);
 	vector<MosaitImg> final_images;
         mosait(image_orig, centroid, final_images, uniq);
@@ -347,7 +349,7 @@ int interactive()
 				cin >> fileout;
 				cerr << fileout << endl;
 				vector<MosaitImg> final_images;
-				fipImage::fipImage image_orig;
+				fipImage image_orig;
 				image_orig.load(file.c_str());
 				mosait(image_orig, centroid, final_images, uniq);
 				ofstream myfile;
@@ -373,7 +375,7 @@ int interactive()
 				cerr << cmd << " " << file << " " << uniq << " " << fileout << " " << size << " " << filetxt << endl;
 				vector<MosaitImg> final_images;
 				try {
-					fipImage::fipImage image_orig;
+					fipImage image_orig;
 					image_orig.load(file.c_str());
 					mosait(image_orig, centroid, final_images, uniq);
 					ofstream myfile;
