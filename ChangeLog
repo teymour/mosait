@@ -1,0 +1,10 @@
+version 0.4.1 :
+  This version corrects the following bugs :
+    * directory recognition;
+    * trailing slash;
+    * corrupted images;
+    * small db seg fault.
+  Thanks to David Hruska, Bread Dawson, Bob Story, Markus Demleitner and Ivan Chen for their bug reports.
+
+version 0.4:
+  First public release
