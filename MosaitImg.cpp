@@ -7,10 +7,10 @@
 #include <FreeImagePlus.h>
 #include <vector>
 
-MosaitImg::MosaitImg() : filename()
+MosaitImg::MosaitImg() : filename(), nb_used(0)
 {}
 
-MosaitImg::MosaitImg(string & file) : filename(file)
+MosaitImg::MosaitImg(string & file) : filename(file), nb_used(0)
 {
 	fipImage image;
 	if (!image.load(file.c_str()))
@@ -18,12 +18,12 @@ MosaitImg::MosaitImg(string & file) : filename(file)
 	init(image);
 }
 
-MosaitImg::MosaitImg(fipImage & image) : filename()
+MosaitImg::MosaitImg(fipImage & image) : filename(), nb_used(0)
 {
 	init(image);
 }
 
-MosaitImg::MosaitImg(int size_x, int size_y) :filename("randomized")
+MosaitImg::MosaitImg(int size_x, int size_y) :filename("randomized"), nb_used(0)
 {
 	float r, g, b;
 	for(int x = 0; x < DEF_IMG_X ; x++)
@@ -51,6 +51,8 @@ void MosaitImg::init(fipImage & image)
 //		cerr << pixels.back() << " " << r << " " << g << " " << b << endl;
 		i++;
 	}
+	nb_used = 0;
+	distance = 0;
 }
 
 string MosaitImg::getFileName()
@@ -74,7 +76,7 @@ float MosaitImg::getDistanceWith(const MosaitImg & img, bool withlight) const
 	{
 		res += pixels[cpt].getDistanceWith(img.pixels[cpt], withlight);
 	}
-	return res/cpt;
+	return res/cpt + (nb_used + img.nb_used) * MOSAITIMAGE_UNFAIRSCORE;
 }
 void  MosaitImg::setDistanceWith(const MosaitImg & img, bool withlight)
 {

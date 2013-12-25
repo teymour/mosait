@@ -7,6 +7,9 @@
 #include "MosaitCommon.h"
 #include "MosaitImg.h"
 #include <vector>
+#define MOSAITCENTROID_REMOVE 1
+#define MOSAITCENTROID_UNFAIR 2
+#define MOSAITCENTROID_KEEP 0
 
 class MosaitCentroid
 {
@@ -15,7 +18,7 @@ class MosaitCentroid
 		MosaitCentroid(MosaitCentroid & centroid, int nb_sub_centroids, int max = 0, string out = "");
 		MosaitCentroid(vector<MosaitImg> & images);
 		MosaitCentroid(vector<MosaitImg> & vimages, int nb_sub_centroids, int max);
-		MosaitImg getClosestImage(MosaitImg & image, bool removeit = false);
+		MosaitImg getClosestImage(MosaitImg & image, int remove_or_unfair_it = MOSAITCENTROID_REMOVE);
 		bool operator==(const MosaitCentroid & centroid) const;
 		std::ostream& dumpInStream(std::ostream& os);
 		friend std::ostream& operator<<(std::ostream& os, MosaitCentroid & mc);

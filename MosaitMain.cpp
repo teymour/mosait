@@ -129,7 +129,7 @@ bool compareByDistance(const pair<int, MosaitImg> & ir1, const pair<int, MosaitI
 	return MosaitImg::compareByDistance(ir1.second, ir2.second);
 }
 
-void mosait(fipImage & image, MosaitCentroid & centroid, vector<MosaitImg> & images_dest, bool uniq = true)
+void mosait(fipImage & image, MosaitCentroid & centroid, vector<MosaitImg> & images_dest, int mosait_flag = MOSAITCENTROID_REMOVE)
 {
 	cerr << "Crop images..." << endl;
 	vector<pair<int, MosaitImg> > images_src;
@@ -147,7 +147,7 @@ void mosait(fipImage & image, MosaitCentroid & centroid, vector<MosaitImg> & ima
 	cerr << "Original image cut into " << images_src.size() << " pieces" << endl;
 	if (centroid.getNbImages() < images_src.size()) {
 		cerr << "Not enougth images in the db to compute unique algorithm. Duplicated forced" << endl;
-		uniq = false;
+		mosait_flag = MOSAITCENTROID_UNFAIR;
 	}
 	time_t debut = time(NULL);
 	images_dest = vector<MosaitImg> (images_src.size());
@@ -165,7 +165,7 @@ void mosait(fipImage & image, MosaitCentroid & centroid, vector<MosaitImg> & ima
 	for(vector<pair<int, MosaitImg > >::iterator iSrc = images_src.begin() ; iSrc < images_src.end() ; iSrc++) 
 	{
 		cpt++;
-		images_dest[iSrc->first] = centroid.getClosestImage(iSrc->second, uniq);
+		images_dest[iSrc->first] = centroid.getClosestImage(iSrc->second, mosait_flag);
 		if (cpt*scale/size > current) {
 			cerr << "=" ;
 			current = cpt*scale/size;
@@ -253,7 +253,7 @@ void help() {
 	cout << "Usage:\n";
 	cout << "\tCreate image db\n\t\tmosait -c <images_dir> -o <output_db_file>\n";
 	cout << "\tOptimize image db\n\t\tmosait -O <nb_centroids> -d <db_file> [-o <output_db_file>] [-n <max_images_per_centroid>]\n";
-	cout << "\tCreate mosaic\n\t\tmosait -d <db_file> -i <src_image> -o <output_image> [-s <max_size_output_image>] [-u] [-t <output_txt>]\n";
+	cout << "\tCreate mosaic\n\t\tmosait -d <db_file> -i <src_image> -o <output_image> [-s <max_size_output_image>] [-b] [-m] [-t <output_txt>]\n";
 	cout << "\tInteractive mode\n\t\tmosait -I\n";
 }
 
@@ -307,7 +307,7 @@ void optimize_db(char *&  db, int nb_centroid, int max_imgs, char *& out_db)
         save_to_file(centroid, sout_db);
 }
 
-void mosait_do(char* & db, char* & in_img, char* & out_img, bool uniq, int size, char* & out_txt)
+void mosait_do(char* & db, char* & in_img, char* & out_img, int mosait_flag, int size, char* & out_txt)
 {
         MosaitCentroid centroid;
 	string sdb(db);
@@ -315,7 +315,7 @@ void mosait_do(char* & db, char* & in_img, char* & out_img, bool uniq, int size,
 	fipImage image_orig;
         image_orig.load(in_img);
 	vector<MosaitImg> final_images;
-        mosait(image_orig, centroid, final_images, uniq);
+        mosait(image_orig, centroid, final_images, mosait_flag);
         ofstream myfile;
 	if (out_txt) {
 	        myfile.open(out_txt);
@@ -351,7 +351,7 @@ int interactive()
 				vector<MosaitImg> final_images;
 				fipImage image_orig;
 				image_orig.load(file.c_str());
-				mosait(image_orig, centroid, final_images, uniq);
+				mosait(image_orig, centroid, final_images, (uniq) ? MOSAITCENTROID_UNFAIR : MOSAITCENTROID_REMOVE);
 				ofstream myfile;
 				myfile.open(fileout.c_str());
 				print_images(final_images, image_orig, myfile);
@@ -377,7 +377,7 @@ int interactive()
 				try {
 					fipImage image_orig;
 					image_orig.load(file.c_str());
-					mosait(image_orig, centroid, final_images, uniq);
+					mosait(image_orig, centroid, final_images, (uniq) ? MOSAITCENTROID_UNFAIR : MOSAITCENTROID_REMOVE);
 					ofstream myfile;
                 	                myfile.open(filetxt.c_str());
                         	        print_images(final_images, image_orig, myfile);
@@ -406,12 +406,12 @@ int main(int argc, char** argv)
         char *out_res = NULL;
         char *in_img = NULL;
         char *out_txt = NULL;
-        bool uniq = true;
+        int mosait_flag = MOSAITCENTROID_REMOVE;
         int nb_centroids = 0;
 	int max_imgs = 0;
         bool interact = false;
         int size = 0;
-        while ((c = getopt (argc, argv, "c:d:s:uo:i:t:O:m:Ih")) != -1)
+        while ((c = getopt (argc, argv, "c:d:s:ubo:i:t:O:m:Ih")) != -1)
          switch (c)
           {
                 case 'c':
@@ -424,8 +424,11 @@ int main(int argc, char** argv)
                         size = atoi(optarg);
                         break;
                 case 'u':
-                        uniq = false;
-                        break;
+			mosait_flag = MOSAITCENTROID_UNFAIR;
+			break;
+		case 'b':
+			mosait_flag = MOSAITCENTROID_KEEP;
+			break;
                 case 'o':
                         out_res = optarg;
                         break;
@@ -459,7 +462,7 @@ int main(int argc, char** argv)
 		exit(0);
 	}
 	if (cdb) {
-		mosait_do(cdb, in_img, out_res, uniq, size, out_txt); 
+		mosait_do(cdb, in_img, out_res, mosait_flag, size, out_txt); 
 		exit(0);
 	}
 	help();

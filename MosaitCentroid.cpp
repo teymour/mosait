@@ -133,7 +133,7 @@ void MosaitCentroid::split(int nb_sub_centroids, int max)
 	images = vector<MosaitImg>();
 }
 
-MosaitImg MosaitCentroid::getClosestImage(MosaitImg & image, bool removeit) 
+MosaitImg MosaitCentroid::getClosestImage(MosaitImg & image, int remove_or_unfair_it) 
 {
 	if (has_sub_centroids)
 	{
@@ -151,7 +151,7 @@ MosaitImg MosaitCentroid::getClosestImage(MosaitImg & image, bool removeit)
 				best = iCent;
 			}
 		}
-		MosaitImg img = best->getClosestImage(image, removeit);
+		MosaitImg img = best->getClosestImage(image, remove_or_unfair_it);
 		if (!best->getNbImages()) {
 			sub_centroids.erase(best);
 		}
@@ -170,10 +170,12 @@ MosaitImg MosaitCentroid::getClosestImage(MosaitImg & image, bool removeit)
 	}
 	MosaitImg result = *best;
 	result.setDistanceWith(image);
-	if (removeit) {
+	if (remove_or_unfair_it == MOSAITCENTROID_REMOVE) {
 		images.erase(best);
+	}else if (remove_or_unfair_it == MOSAITCENTROID_UNFAIR) {
+		best->incrUsed();
 	}
-//	cerr << " t: " << best->getFileName() << " " << best->getDistance() << " " << best_distance << " " <<  best->getDistanceWith(image) << endl;
+//	cerr << " t: " << best->getFileName() << " " << best->getDistance() << " " << best_distance << " " <<  best->getDistanceWith(image) << " " << best->getNbUsed() << endl;
 //	exit(0);
 //	sort(images.begin(), images.end(), MosaitImg::compareByDistance);
 	return result;

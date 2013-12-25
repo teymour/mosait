@@ -59,11 +59,14 @@ class DLLEXPORT MosaitImg
 		float getDistanceWith(const MosaitImg & img, bool withlight = 1) const;
 		void  setDistanceWith(const MosaitImg & img, bool withlight = 1);
 		void setAverage(const vector<MosaitImg> images);
+		inline void incrUsed() { nb_used ++ ; };
+		inline int getNbUsed() const {return nb_used;};
 	private:
 		string filename;
 		vector<MosaitPixel> pixels;
 		float distance;
 		void init(fipImage & image) ;
+		int nb_used;
 };
 
 
