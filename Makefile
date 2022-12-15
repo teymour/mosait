@@ -8,7 +8,7 @@ CFLAGS= -ggdb
 CXXFLAGS= -ggdb
 #CXXFLAGS= -ggdb -O2 
 #CXXFLAGS= -O2
-LFLAGS= -lfreeimageplus
+LFLAGS= -lfreeimageplus -lfreeimage
 
 CC=g++ 
 
