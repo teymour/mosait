@@ -2,7 +2,7 @@
 
 ## 1. install dependencies 
 
-    $ sudo apt-get install libfreeimage-dev libjpeg8-dev
+    $ sudo apt-get install libfreeimage-dev libfreeimageplus-dev libjpeg8-dev
 
 ## 2. compile
 
